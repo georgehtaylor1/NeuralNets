@@ -19,8 +19,10 @@ with open(data_file, 'rb') as csv_file:
 shuffle(data_list)
 full_len = len(data_list)
 training_len = int(math.floor(full_len * training_proportion))
-print full_len
+print "Sample cases loaded: {}".format(full_len)
 
 training_data = data_list[:training_len]
 test_data = data_list[training_len:]
 
+print "Training cases: {}".format(len(training_data))
+print "Test cases: {}".format(len(test_data))

@@ -28,40 +28,39 @@ class NeuralNet(object):
         layer_output = sigmoid(np.dot(layer_hidden[self.hidden_layers - 1], self.synapse_output))
         return layer_input, layer_hidden, layer_output
 
-    def train(self, sample_data, sample_cases, output_data, iterations):
+    def train_full(self, sample_data, sample_cases, output_data, iterations):
         for i in xrange(iterations):
-            layer_input, layer_hidden, layer_output = self.feed_forward(sample_data, sample_cases)
-            # Calculate the error in the output
-            output_error = layer_output - output_data
-            output_delta = output_error * sigmoid_output_to_deriv(layer_output)
+            train(sample_data, sample_cases, output_data)
 
-            # Back propagate the errors
-            hidden_errors = np.zeros((self.hidden_layers, sample_cases, self.hidden_size))
-            hidden_deltas = np.zeros((self.hidden_layers, sample_cases, self.hidden_size))
+    def train(self, sample_data, sample_cases, output_data):
+        layer_input, layer_hidden, layer_output = self.feed_forward(sample_data, sample_cases)
+        # Calculate the error in the output
+        output_error = layer_output - output_data
+        output_delta = output_error * sigmoid_output_to_deriv(layer_output)
 
-            hidden_errors[self.hidden_layers - 1] = output_delta.dot(self.synapse_output.T)
-            hidden_deltas[self.hidden_layers - 1] = hidden_errors[self.hidden_layers - 1] * sigmoid_output_to_deriv(
-                layer_hidden[self.hidden_layers - 1])
+        # Back propagate the errors
+        hidden_errors = np.zeros((self.hidden_layers, sample_cases, self.hidden_size))
+        hidden_deltas = np.zeros((self.hidden_layers, sample_cases, self.hidden_size))
 
-            for j in range(self.hidden_layers - 2, -1, -1):
-                hidden_errors[j] = hidden_deltas[j + 1].dot(self.synapse_hidden[j].T)
-                hidden_deltas[j] = hidden_errors[j + 1] * sigmoid_output_to_deriv(layer_hidden[j])
+        hidden_errors[self.hidden_layers - 1] = output_delta.dot(self.synapse_output.T)
+        hidden_deltas[self.hidden_layers - 1] = hidden_errors[self.hidden_layers - 1] * sigmoid_output_to_deriv(
+            layer_hidden[self.hidden_layers - 1])
 
-                # Adjust the synapse weights
-                self.synapse_output -= self.alpha * (layer_hidden[self.hidden_layers - 1].T.dot(output_delta))
-            for j in range(self.hidden_layers - 2, -1, -1):
-                self.synapse_hidden[j] -= self.alpha * (layer_hidden[j].T.dot(hidden_deltas[j + 1]))
+        for j in range(self.hidden_layers - 2, -1, -1):
+            hidden_errors[j] = hidden_deltas[j + 1].dot(self.synapse_hidden[j].T)
+            hidden_deltas[j] = hidden_errors[j + 1] * sigmoid_output_to_deriv(layer_hidden[j])
 
-                self.synapse_input -= self.alpha * (layer_input.T.dot(hidden_deltas[0]))
+            # Adjust the synapse weights
+            self.synapse_output -= self.alpha * (layer_hidden[self.hidden_layers - 1].T.dot(output_delta))
+        for j in range(self.hidden_layers - 2, -1, -1):
+            self.synapse_hidden[j] -= self.alpha * (layer_hidden[j].T.dot(hidden_deltas[j + 1]))
 
-            if i % 1000 == 0:
-                training_error = np.mean(np.abs(output_error))
-                print "Error after " + str(i) + " iterations:" + str(training_error)
+            self.synapse_input -= self.alpha * (layer_input.T.dot(hidden_deltas[0]))
 
         _, _, layer_output = self.feed_forward(sample_data, sample_cases)
         print layer_output
         training_error = np.mean(np.abs(output_error))
-        print "Error after " + str(i) + " iterations:" + str(training_error)
+        print "Error after iteration:" + str(training_error)
         return training_error
 
     def test(self, input_data, input_length, output_data):
