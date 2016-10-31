@@ -2,8 +2,13 @@ import numpy as np
 
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
+    r = 0
+    try:
+        r = 1 / (1 + np.exp(-x))
+    except err:
+        print x
+        1/0
+    return r
 
 def sigmoid_output_to_deriv(x):
     return x * (1 - x)
@@ -58,7 +63,7 @@ class NeuralNet(object):
             self.synapse_input -= self.alpha * (layer_input.T.dot(hidden_deltas[0]))
 
         _, _, layer_output = self.feed_forward(sample_data, sample_cases)
-        print layer_output
+        #print layer_output
         training_error = np.mean(np.abs(output_error))
         print "Error after iteration:" + str(training_error)
         return training_error
@@ -67,7 +72,7 @@ class NeuralNet(object):
         layer_input, layer_hidden, layer_output = self.feed_forward(input_data, input_length)
         count = 0
         for i in range(input_length):
-            print(layer_output[0][i])
+            print(layer_output[i][0])
             print(output_data)
             print("------------------------")
             if layer_output[i] == output_data[i]:
