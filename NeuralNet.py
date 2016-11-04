@@ -72,9 +72,7 @@ class NeuralNet(object):
         layer_input, layer_hidden, layer_output = self.feed_forward(input_data, input_length)
         count = 0
         for i in range(input_length):
-            print(layer_output[i][0])
-            print(output_data)
-            print("------------------------")
+            print("{} --> {}".format(output_data[i], layer_output[i][0]))
             if layer_output[i] == output_data[i]:
                 count += 1
         print(count)

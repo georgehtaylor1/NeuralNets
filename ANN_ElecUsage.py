@@ -56,13 +56,13 @@ def genData(data, length):
     return np.array(train_data), np.array(test_data)
 
 
-net = nn.NeuralNet(4, 6, 1, 2, 0.05)
+net = nn.NeuralNet(4, 6, 1, 2, 0.1)
 
 d, train, test_data = load_data()
 
 def run():
     input_length = 200
-    iterations = 20000
+    iterations = 100000
     errors = []
     for i in xrange(iterations):
         sub_train, sub_out = genData(train, input_length)
